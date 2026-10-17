@@ -1,6 +1,6 @@
 /* Guarda o app no celular pra abrir sem internet (academia costuma ter sinal ruim).
    Ao publicar versao nova, trocar VERSAO: o iPhone baixa tudo de novo na abertura seguinte. */
-const VERSAO = 'faixa-preta-2026-10-17c';
+const VERSAO = 'faixa-preta-2026-10-17d';
 const ARQUIVOS = [
   './', 'index.html', 'base.css', 'faixa-preta.css', 'app.css', 'visual.js', 'motor.js',
   'manifest.webmanifest', 'icone-180.png', 'icone-192.png', 'icone-512.png',

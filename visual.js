@@ -8,6 +8,14 @@
     '3': { name: 'TATAME', subtitle: 'JIU-JITSU · RITMO DE TREINO', headline: 'Entre.<br>Encaixe.<br>Repita.', intro: 'Um round de cada vez.' }
   };
   const theme = themes[direction];
+  // Desenhos vetoriais: o iPhone não substitui os controles por emoji.
+  const icons = {
+    infinito: '<svg viewBox="0 0 32 18" aria-hidden="true"><path d="M16 9C12 2 10 2 7 2a7 7 0 0 0 0 14c3 0 5-2 9-7s6-7 9-7a7 7 0 0 1 0 14c-3 0-5-2-9-7Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    pausar: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h5v16H5zm9 0h5v16h-5z" fill="currentColor"/></svg>',
+    continuar: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v18l15-9z" fill="currentColor"/></svg>',
+    parar: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z" fill="currentColor"/></svg>',
+    novo: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 8a8 8 0 1 0 1 8M19 3v6h-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/></svg>'
+  };
   const embedded = new URLSearchParams(location.search).get('embed') === '1';
   document.body.classList.toggle('embedded', embedded);
   document.body.insertAdjacentHTML('beforeend', `
@@ -17,8 +25,9 @@
         <div class="edition">TREINO LIVRE<br>JIU-JITSU</div>
       </header>
       <section class="setup" aria-label="Ajustar treino">
-        <div class="setup-heading"><p class="eyebrow">SEU TEMPO NO TATAME</p><h1>${theme.headline}</h1><p class="intro">${theme.intro}</p></div>
         <form id="settings-form">
+          <div class="setup-scroll" tabindex="0" role="region" aria-label="Configurações do treino, role para ver mais">
+          <div class="setup-heading"><p class="eyebrow">SEU TEMPO NO TATAME</p><h1>${theme.headline}</h1><p class="intro">${theme.intro}</p></div>
           <div class="settings">
             <fieldset><legend>Round <span>01 / TEMPO DE LUTA</span></legend>
               <div class="presets" data-presets="round">${[3,4,5,6,7,8,10].map(n => `<button class="preset" type="button" data-seconds="${n*60}" aria-pressed="${n === 5}" aria-label="${n} minutos de round">${n}<small>min</small></button>`).join('')}</div>
@@ -29,19 +38,20 @@
               <div class="custom"><span>Ajuste livre</span><div class="custom-fields"><input id="rest-min" type="number" inputmode="numeric" min="0" max="99" step="1" value="1" required aria-label="Minutos de descanso"><span>min</span><input id="rest-sec" type="number" inputmode="numeric" min="0" max="59" step="1" value="0" required aria-label="Segundos de descanso"><span>s</span></div></div>
             </fieldset>
             <fieldset><legend>Rounds <span>03 / REPETIÇÕES</span></legend>
-              <div class="count-row"><button class="preset" type="button" id="unlimited" aria-pressed="true">∞ <small>SEM LIMITE</small></button><button class="preset" type="button" id="limited" aria-pressed="false">DEFINIR</button><label class="custom"><input id="round-count" type="number" inputmode="numeric" min="1" max="99" step="1" value="5" disabled required aria-label="Quantidade de rounds"></label></div>
+              <div class="count-row"><button class="preset" type="button" id="unlimited" aria-pressed="true"><span class="infinity-icon" aria-hidden="true">${icons.infinito}</span><small>SEM LIMITE</small></button><button class="preset" type="button" id="limited" aria-pressed="false">DEFINIR</button><label class="custom"><input id="round-count" type="number" inputmode="numeric" min="1" max="99" step="1" value="5" disabled required aria-label="Quantidade de rounds"></label></div>
             </fieldset>
           </div>
-          <div class="setup-foot"><button class="primary" type="submit">Começar <span class="arrow" aria-hidden="true">↗</span></button><p class="setup-note">5 segundos para preparar antes da luta.<br>Se o som não sair, <b>tire o iPhone do silencioso.</b></p></div>
+          </div>
+          <div class="setup-foot"><button class="primary" type="submit" aria-label="Começar treino"><span class="start-copy"><small>ENTRE NO TATAME</small><strong>COMEÇAR</strong></span><span class="start-belt" aria-hidden="true"><i></i><i></i><i></i></span></button><p class="setup-note">5 segundos para preparar antes da luta.<br>Se o som não sair, <b>tire o iPhone do silencioso.</b></p></div>
         </form>
       </section>
       <section class="live" hidden aria-label="Treino">
-        <div class="phase-header"><h1 class="phase-name" id="phase-name">ROUND</h1><div class="round-meta">ROUND <strong id="round-label">01 / ∞</strong></div></div>
+        <div class="phase-header"><h1 class="phase-name" id="phase-name">ROUND</h1><div class="round-meta">ROUND <strong id="round-label"></strong></div></div>
         <div class="timer-box"><div class="time" id="time" role="timer" aria-atomic="true" aria-live="off"></div></div>
         <div class="status-line" id="status" role="status"></div>
         <p class="finish-message" id="finish-message"></p>
         <div class="phase-track" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="controls"><button class="control pause" id="pause" type="button"><span class="control-icon" aria-hidden="true">Ⅱ</span><span id="pause-label">PAUSAR</span></button><button class="control stop" id="stop" type="button"><span class="control-icon" aria-hidden="true">■</span>PARAR</button></div>
+        <div class="controls"><button class="control pause" id="pause" type="button"><span class="control-icon" aria-hidden="true">${icons.pausar}</span><span id="pause-label">PAUSAR</span></button><button class="control stop" id="stop" type="button"><span class="control-icon" aria-hidden="true">${icons.parar}</span>PARAR</button></div>
       </section>
     </main>
     <dialog id="stop-dialog" aria-labelledby="stop-title" aria-describedby="stop-description"><h2 id="stop-title">Encerrar o treino?</h2><p id="stop-description">Confirme para parar. Para seguir do mesmo ponto, toque em Voltar.</p><div class="dialog-actions"><button type="button" id="cancel-stop" autofocus>VOLTAR</button><button class="confirm-stop" type="button" id="confirm-stop">ENCERRAR</button></div></dialog>
@@ -49,6 +59,37 @@
   const $ = selector => document.querySelector(selector);
   const app = $('.app');
   const dialog = $('#stop-dialog');
+  // Só layout: acompanha a área visível quando o teclado cobre a tela do iOS.
+  // O relógio e o áudio continuam inteiramente no motor.js.
+  const viewport = window.visualViewport;
+  let viewportFrame = 0;
+  function updateSetupViewport() {
+    const input = document.activeElement;
+    const editing = app.dataset.fase === 'ajuste' && input?.matches('input');
+    const keyboard = Boolean(editing && viewport && viewport.scale < 1.05 && document.documentElement.clientHeight - viewport.height > 100);
+    app.classList.toggle('keyboard-open', keyboard);
+    if (keyboard) {
+      app.style.setProperty('--keyboard-height', `${viewport.height}px`);
+      app.style.setProperty('--keyboard-top', `${viewport.offsetTop}px`);
+      const scroll = $('.setup-scroll');
+      const field = input.getBoundingClientRect();
+      const area = scroll.getBoundingClientRect();
+      if (field.bottom > area.bottom - 8) scroll.scrollTop += field.bottom - area.bottom + 8;
+      else if (field.top < area.top + 8) scroll.scrollTop -= area.top + 8 - field.top;
+    } else {
+      app.style.removeProperty('--keyboard-height');
+      app.style.removeProperty('--keyboard-top');
+    }
+  }
+  function scheduleViewportUpdate() {
+    cancelAnimationFrame(viewportFrame);
+    viewportFrame = requestAnimationFrame(updateSetupViewport);
+  }
+  viewport?.addEventListener('resize', scheduleViewportUpdate);
+  viewport?.addEventListener('scroll', scheduleViewportUpdate);
+  window.addEventListener('resize', scheduleViewportUpdate);
+  document.addEventListener('focusin', scheduleViewportUpdate);
+  document.addEventListener('focusout', scheduleViewportUpdate);
   let current = { fase: 'ajuste', restante: 300, round: 1, totalRounds: null, pausado: false };
   let finiteRounds = false;
   const examples = {
@@ -95,7 +136,7 @@
     $('.live').hidden = setup;
     const phaseText = { prepara: 'PREPARA', round: 'ROUND', descanso: 'DESCANSO', fim: 'TREINO CONCLUÍDO' }[s.fase] || 'AJUSTE';
     $('#phase-name').textContent = paused ? 'PAUSADO' : phaseText;
-    $('#round-label').textContent = `${String(s.round).padStart(2,'0')} / ${s.totalRounds == null ? '∞' : String(s.totalRounds).padStart(2,'0')}`;
+    $('#round-label').innerHTML = `<span>${String(s.round).padStart(2,'0')} / </span>${s.totalRounds == null ? `<span class="infinity-icon" role="img" aria-label="sem limite">${icons.infinito}</span>` : String(s.totalRounds).padStart(2,'0')}`;
     const mins = String(Math.floor(s.restante / 60)).padStart(2,'0');
     const secs = String(s.restante % 60).padStart(2,'0');
     const colon = direction === '2' ? '<svg viewBox="0 0 12 90" aria-hidden="true"><rect y="22" width="12" height="12"/><rect y="56" width="12" height="12"/></svg>' : ':';
@@ -105,12 +146,13 @@
     $('#status').textContent = paused ? `${phaseText} · CONTINUE QUANDO QUISER` : done ? 'MISSÃO CUMPRIDA' : urgent ? 'ÚLTIMOS 5 SEGUNDOS' : s.fase === 'prepara' ? 'POSICIONE-SE NO TATAME' : s.fase === 'descanso' ? 'RESPIRE. O PRÓXIMO VEM AÍ.' : 'FOCO NA LUTA';
     $('#finish-message').textContent = `${s.round} ${s.round === 1 ? 'round concluído' : 'rounds concluídos'}. Treino feito.`;
     $('#pause-label').textContent = done ? 'NOVO TREINO' : paused ? 'CONTINUAR' : 'PAUSAR';
-    $('.control-icon').textContent = done ? '↗' : paused ? '▶' : 'Ⅱ';
+    $('#pause .control-icon').innerHTML = done ? icons.novo : paused ? icons.continuar : icons.pausar;
     $('#pause').setAttribute('aria-label', done ? 'Novo treino' : paused ? 'Continuar treino' : 'Pausar treino');
     document.querySelectorAll('.phase-track i').forEach((bar, i) => bar.classList.toggle('dim', (urgent || s.fase === 'prepara') && i >= s.restante));
     let key = setup ? 'ajuste' : paused ? 'pausado' : urgent && s.fase === 'round' ? 'ultimos' : s.fase;
     document.querySelectorAll('[data-demo]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.demo === key)));
     if (dialog.open && (setup || done || previous.fase !== s.fase)) dialog.close();
+    scheduleViewportUpdate();
     return { ...current };
   };
   function secondsFor(group) {
