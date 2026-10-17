@@ -129,6 +129,10 @@ html, body { overflow: hidden; }
 .live .time { pointer-events: none; }
 .live .controls { position: relative; z-index: 2; }
 
+/* O bloco branco "Respeito. Pressão. Repetição." saiu: ocupava espaço demais
+   (dele, 17/10/2026: "Essa parte branca é bonita, mas ocupa espaço demais na tela"). */
+.setup-heading { display: none; }
+
 /* pausado no descanso ou no prepara: o numero fica lilas como no round (a regra da fase ganhava) */
 .app.is-paused .time { color: var(--pausado); }
 
