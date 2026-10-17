@@ -136,6 +136,21 @@ html, body { overflow: hidden; }
 .setup-heading h1 { font-size: clamp(19px, 6.4vw, 30px); line-height: 1; margin: 0; white-space: nowrap; letter-spacing: -.01em; }
 .setup-heading::after { width: 34px; height: 10px; top: -4px; right: 12px; }
 
+/* Botões do ajuste maiores, crescendo com a altura da tela pra ocupar o espaço que sobrou
+   (dele, 17/10/2026: "os botões maiores um pouco, pra ocupar o resto do espaço"). */
+@media (orientation: portrait) {
+  .settings { gap: clamp(16px, 3.2vh, 34px); }
+  legend { font-size: clamp(19px, 2.6vh, 24px); margin-bottom: clamp(8px, 1.2vh, 12px); }
+  .presets { gap: clamp(6px, 1vh, 9px); }
+  .preset { min-height: clamp(44px, 8.4vh, 78px); font-size: clamp(19px, 3vh, 28px); }
+  .preset small { font-size: clamp(11px, 1.5vh, 14px); }
+  .custom { margin-top: clamp(9px, 1.3vh, 14px); font-size: clamp(14px, 1.9vh, 17px); }
+  /* sete botões na fileira do round: a letra segue a largura, senão o "10 min" corta */
+  [data-presets="round"] .preset { font-size: clamp(17px, min(3vh, 5.6vw), 26px); padding-inline: 3px; min-width: 0; }
+  [data-presets="round"] .preset small { font-size: clamp(10px, min(1.5vh, 2.9vw), 13px); margin-left: 2px; }
+  .custom input { width: clamp(57px, 8vh, 74px); height: clamp(44px, 7vh, 64px); font-size: clamp(21px, 3vh, 28px); }
+}
+
 /* pausado no descanso ou no prepara: o numero fica lilas como no round (a regra da fase ganhava) */
 .app.is-paused .time { color: var(--pausado); }
 
