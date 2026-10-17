@@ -129,9 +129,12 @@ html, body { overflow: hidden; }
 .live .time { pointer-events: none; }
 .live .controls { position: relative; z-index: 2; }
 
-/* O bloco branco "Respeito. Pressão. Repetição." saiu: ocupava espaço demais
-   (dele, 17/10/2026: "Essa parte branca é bonita, mas ocupa espaço demais na tela"). */
-.setup-heading { display: none; }
+/* O bloco branco "Respeito. Pressão. Repetição." virou uma faixa fina, numa linha só
+   (dele, 17/10/2026: "ocupa espaço demais"; depois "deixar a faixa branca, só que menor"). */
+.setup-heading { flex-shrink: 0; margin: 2px 0 16px; padding: 9px 14px 8px; }
+.setup-heading .eyebrow, .setup-heading .intro { display: none; }
+.setup-heading h1 { font-size: clamp(19px, 6.4vw, 30px); line-height: 1; margin: 0; white-space: nowrap; letter-spacing: -.01em; }
+.setup-heading::after { width: 34px; height: 10px; top: -4px; right: 12px; }
 
 /* pausado no descanso ou no prepara: o numero fica lilas como no round (a regra da fase ganhava) */
 .app.is-paused .time { color: var(--pausado); }

@@ -3,7 +3,7 @@
   'use strict';
   const direction = document.body.dataset.direcao;
   const themes = {
-    '1': { name: 'FAIXA PRETA', subtitle: 'JIU-JITSU · TREINO', headline: 'Respeito.<br>Pressão. Repetição.', intro: 'Ajuste o treino. O resto é no tatame.' },
+    '1': { name: 'FAIXA PRETA', subtitle: 'JIU-JITSU · TREINO', headline: 'Respeito. Pressão. Repetição.', intro: 'Ajuste o treino. O resto é no tatame.' },
     '2': { name: 'ARENA', subtitle: 'JIU-JITSU / ROUND TIMER', headline: 'O próximo<br>round é seu.', intro: 'TEMPO DEFINIDO. FOCO NA LUTA.' },
     '3': { name: 'TATAME', subtitle: 'JIU-JITSU · RITMO DE TREINO', headline: 'Entre.<br>Encaixe.<br>Repita.', intro: 'Um round de cada vez.' }
   };
