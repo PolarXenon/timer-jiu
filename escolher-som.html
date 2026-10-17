@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0b0c">
+<title>Escolher o Som</title>
+<style>
+  :root { --fundo: #0b0b0c; --cartao: #17171a; --linha: #2a2a2f; --texto: #f2f2f2; --apagado: #9a9aa3; --vermelho: #e3262e; --verde: #2fbf5b; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; background: var(--fundo); color: var(--texto); font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         padding: calc(16px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom)); max-width: 640px; margin: 0 auto; }
+  h1 { font-size: 34px; line-height: 1; margin: 8px 0 4px; text-transform: uppercase; font-weight: 900; }
+  h1 span { color: var(--vermelho); }
+  h2 { font-size: 20px; text-transform: uppercase; font-weight: 900; margin: 26px 0 4px; }
+  .sub { color: var(--apagado); margin: 0 0 12px; }
+  .opcao { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: center; background: var(--cartao);
+           border: 2px solid var(--linha); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; }
+  .opcao.sel { border-color: var(--verde); }
+  button { font: inherit; border: 0; cursor: pointer; }
+  .play { width: 52px; height: 52px; border-radius: 50%; background: var(--vermelho); color: #fff; font-size: 20px; }
+  .play:active { transform: scale(0.95); }
+  .nome { font-weight: 800; }
+  .desc { color: var(--apagado); font-size: 14px; }
+  .escolher { padding: 8px 12px; border-radius: 999px; background: #232328; color: #ddd; border: 1px solid var(--linha); font-size: 14px; }
+  .sel .escolher { background: var(--verde); color: #04130a; border-color: var(--verde); font-weight: 700; }
+  .junto { width: 100%; padding: 18px; border-radius: 12px; background: var(--vermelho); color: #fff; font-weight: 900; font-size: 18px; text-transform: uppercase; margin-top: 8px; }
+  .escolha { background: var(--cartao); border-left: 4px solid var(--verde); border-radius: 10px; padding: 12px 14px; margin-top: 12px; }
+</style>
+</head>
+<body>
+<h1>Escolher o <span>Som</span></h1>
+<p class="sub">Ouça, marque um gongo e um beep, e toque a sequência completa pra ouvir como fica na luta. Todos estão no mesmo volume, pra comparação ser justa.</p>
+
+<h2>Gongo</h2>
+<p class="sub">Sinos de ringue gravados de verdade (A, B e C são três sinos diferentes).</p>
+<div id="gongos"></div>
+
+<h2>Beep</h2>
+<p class="sub">O que toca nos 5 segundos antes do gongo.</p>
+<div id="beeps"></div>
+
+<h2>Sequência completa</h2>
+<p class="sub">5 beeps, um por segundo, e o gongo, como no fim do round.</p>
+<button class="junto" id="junto">Tocar sequência</button>
+<div class="escolha" id="escolha"></div>
+
+<script>
+(() => {
+  const GONGOS = [
+    ['sino-a1', 'A, um golpe', 'Seco e limpo, some rápido'],
+    ['sino-a2', 'A, dois golpes', 'Ding ding'],
+    ['sino-a3', 'A, três golpes', 'Ding ding ding, o clássico de fim de round'],
+    ['sino-b2', 'B, um golpe longo', 'Sino maior, fica soando'],
+    ['sino-b4', 'B, dois golpes', 'Ding ding, mais encorpado'],
+    ['sino-b3', 'B, três golpes', 'Ding ding ding, mais encorpado'],
+    ['sino-c1', 'C, um golpe', 'Mais agudo e forte'],
+  ];
+  const BEEPS = [
+    ['beep-1', 'Relógio digital', 'Agudo e curto, bip de cronômetro'],
+    ['beep-2', 'Timer de academia', 'Tom limpo e redondo'],
+    ['beep-3', 'Placar', 'Mais grave e encorpado'],
+    ['beep-4', 'Duplo', 'Dois bips rápidos por segundo'],
+  ];
+  let ctx = null;
+  const buffers = {};
+  const escolha = { gongo: null, beep: null };
+  let tocando = [];
+
+  async function contexto() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state !== 'running') await ctx.resume();
+    return ctx;
+  }
+  async function buffer(id) {
+    if (!buffers[id]) {
+      const r = await fetch('sons/opcoes/' + id + '.wav');
+      buffers[id] = await (await contexto()).decodeAudioData(await r.arrayBuffer());
+    }
+    return buffers[id];
+  }
+  function para() { tocando.forEach(s => { try { s.stop(); } catch (e) {} }); tocando = []; }
+  async function toca(id, quando = 0) {
+    const c = await contexto();
+    const s = c.createBufferSource();
+    s.buffer = await buffer(id);
+    s.connect(c.destination);
+    s.start(c.currentTime + quando);
+    tocando.push(s);
+  }
+
+  function lista(alvo, itens, tipo) {
+    const caixa = document.getElementById(alvo);
+    for (const [id, nome, desc] of itens) {
+      const linha = document.createElement('div');
+      linha.className = 'opcao';
+      linha.innerHTML = '<button class="play" aria-label="Tocar">&#9654;</button><div><div class="nome"></div><div class="desc"></div></div><button class="escolher">Escolher</button>';
+      linha.querySelector('.nome').textContent = nome;
+      linha.querySelector('.desc').textContent = desc;
+      linha.querySelector('.play').addEventListener('click', async () => { para(); await toca(id); });
+      linha.querySelector('.escolher').addEventListener('click', () => {
+        caixa.querySelectorAll('.opcao').forEach(o => o.classList.remove('sel'));
+        linha.classList.add('sel');
+        escolha[tipo] = [id, nome];
+        mostra();
+      });
+      caixa.appendChild(linha);
+    }
+  }
+
+  function mostra() {
+    const g = escolha.gongo ? escolha.gongo[1] + ' (' + escolha.gongo[0] + ')' : 'nenhum ainda';
+    const b = escolha.beep ? escolha.beep[1] + ' (' + escolha.beep[0] + ')' : 'nenhum ainda';
+    document.getElementById('escolha').innerHTML = '<b>Gongo:</b> ' + g + '<br><b>Beep:</b> ' + b;
+  }
+
+  document.getElementById('junto').addEventListener('click', async () => {
+    para();
+    const g = escolha.gongo ? escolha.gongo[0] : GONGOS[2][0];
+    const b = escolha.beep ? escolha.beep[0] : BEEPS[1][0];
+    await buffer(g); await buffer(b);
+    for (let i = 0; i < 5; i++) await toca(b, 0.2 + i);
+    await toca(g, 5.2);
+  });
+
+  lista('gongos', GONGOS, 'gongo');
+  lista('beeps', BEEPS, 'beep');
+  mostra();
+})();
+</script>
+</body>
+</html>
