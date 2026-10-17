@@ -304,5 +304,13 @@
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    // Versao nova chegou: recarrega sozinho, mas so fora da luta (nunca no meio de um round).
+    // Antes disso o Marcos precisava fechar e abrir o app duas vezes pra ver a mudanca.
+    const tinhaControle = !!navigator.serviceWorker.controller;
+    let novaVersao = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (tinhaControle) novaVersao = true; });
+    setInterval(() => {
+      if (novaVersao && (fase === 'ajuste' || fase === 'fim')) { novaVersao = false; location.reload(); }
+    }, 1000);
   }
 })();
