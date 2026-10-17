@@ -136,6 +136,10 @@ html, body { overflow: hidden; }
 .setup-heading h1 { font-size: clamp(19px, 6.4vw, 30px); line-height: 1; margin: 0; white-space: nowrap; letter-spacing: -.01em; }
 .setup-heading::after { width: 34px; height: 10px; top: -4px; right: 12px; }
 
+/* No lugar do X, uma faixa preta amarrada (dele, 17/10/2026: "ao inves de um X estranho,
+   poderia colocar uma faixa amarrada"; "tem q ser uma faixa preta amarrada"). */
+.brand-mark { clip-path: none; background: url("faixa-amarrada.svg") center / contain no-repeat; width: 38px; height: 38px; }
+
 /* Botões do ajuste maiores, crescendo com a altura da tela pra ocupar o espaço que sobrou
    (dele, 17/10/2026: "os botões maiores um pouco, pra ocupar o resto do espaço"). */
 @media (orientation: portrait) {
