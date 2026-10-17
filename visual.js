@@ -32,7 +32,7 @@
               <div class="count-row"><button class="preset" type="button" id="unlimited" aria-pressed="true">∞ <small>SEM LIMITE</small></button><button class="preset" type="button" id="limited" aria-pressed="false">DEFINIR</button><label class="custom"><input id="round-count" type="number" inputmode="numeric" min="1" max="99" step="1" value="5" disabled required aria-label="Quantidade de rounds"></label></div>
             </fieldset>
           </div>
-          <div class="setup-foot"><button class="primary" type="submit">Começar <span class="arrow" aria-hidden="true">↗</span></button><p class="setup-note">5 segundos para preparar antes da luta.<br><b>Tire o iPhone do silencioso:</b> no silencioso não sai som.</p></div>
+          <div class="setup-foot"><button class="primary" type="submit">Começar <span class="arrow" aria-hidden="true">↗</span></button><p class="setup-note">5 segundos para preparar antes da luta.<br>Se o som não sair, <b>tire o iPhone do silencioso.</b></p></div>
         </form>
       </section>
       <section class="live" hidden aria-label="Treino">

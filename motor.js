@@ -24,6 +24,7 @@
   let baixando = null;
   let agendados = new Map();    // id do evento -> { fonte, quando }
   let trava = null;
+  let somVencido = false;       // o app foi pro fundo: o som so volta com um toque
 
   let ajuste = null;            // { tempoRound, tempoDescanso, totalRounds }
   let fase = 'ajuste';
@@ -48,18 +49,31 @@
     return baixando;
   }
 
-  // Chamado dentro do toque em COMECAR: o iPhone so libera som que nasce de um toque.
+  // Chamado dentro de um toque: o iPhone so libera som que nasce de um toque.
+  // Depois que o app vai pro fundo, o iPhone mata o som da pagina e o contexto antigo pode
+  // continuar dizendo "running" sem sair nada (o Marcos achou em 17/10/2026). Entao, na volta,
+  // o contexto e jogado fora e nasce um novo no primeiro toque.
   async function ligaSom() {
     if ('audioSession' in navigator) {
       // "ambient" toca por cima da musica sem pausar o Spotify (Safari nao sabe abaixar a musica)
       try { navigator.audioSession.type = 'ambient'; } catch (e) {}
     }
+    if (ctx && somVencido) {
+      descartaFuturos();
+      const velho = ctx;
+      ctx = null;
+      velho.close().catch(() => {});
+      for (const nome in buffers) delete buffers[nome];
+    }
+    somVencido = false;
     if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
     if (ctx.state !== 'running') { try { await ctx.resume(); } catch (e) {} }
     await baixaSons();
+    const meu = ctx;
     for (const nome of ['beep', 'gongo']) {
-      if (!buffers[nome]) buffers[nome] = await ctx.decodeAudioData(brutos[nome].slice(0));
+      if (!buffers[nome]) buffers[nome] = await meu.decodeAudioData(brutos[nome].slice(0));
     }
+    if (ctx !== meu) return;
     // um quase-silencio pra acordar a saida Bluetooth antes do primeiro beep
     const s = ctx.createBufferSource();
     s.buffer = ctx.createBuffer(1, 2205, ctx.sampleRate);
@@ -76,7 +90,7 @@
     s.connect(ctx.destination);
     const quando = ctx.currentTime + Math.max(0, atraso);
     s.start(quando);
-    agendados.set(id, { fonte: s, quando });
+    agendados.set(id, { fonte: s, quando, em: quandoMs });
     s.onended = () => { if (agendados.get(id)?.fonte === s) agendados.get(id).acabou = true; };
     return true;
   }
@@ -85,6 +99,17 @@
   function cancelaFuturos() {
     for (const [id, a] of agendados) {
       if (ctx && a.quando > ctx.currentTime + 0.01) {
+        try { a.fonte.stop(); } catch (e) {}
+        agendados.delete(id);
+      }
+    }
+  }
+
+  // Esquece tudo que ainda ia tocar (pelo relogio da tela), pra agendar de novo no contexto novo.
+  function descartaFuturos() {
+    const t = agora();
+    for (const [id, a] of agendados) {
+      if (a.fonte && a.em > t) {
         try { a.fonte.stop(); } catch (e) {}
         agendados.delete(id);
       }
@@ -129,14 +154,25 @@
   aviso.type = 'button';
   aviso.className = 'aviso-som';
   aviso.hidden = true;
-  aviso.innerHTML = '<b>SOM PAUSADO PELO IPHONE</b><span>Toque aqui pra religar</span>';
+  aviso.innerHTML = '<b>SOM DESLIGADO</b><span>Toque em qualquer lugar da tela pra religar</span>';
   document.querySelector('.app').appendChild(aviso);
-  aviso.addEventListener('click', async () => { await ligaSom(); agenda(); });
+
+  const emLuta = () => ['prepara', 'round', 'descanso'].includes(fase);
+  const semSom = () => ctx && (somVencido || ctx.state !== 'running');
 
   function avisoSom() {
-    const emLuta = ['prepara', 'round', 'descanso'].includes(fase);
-    aviso.hidden = !(emLuta && ctx && ctx.state !== 'running');
+    aviso.hidden = !(emLuta() && pausadoRestante === null && semSom());
   }
+
+  // Qualquer toque na tela religa o som (o iPhone so aceita som que nasce de um toque).
+  async function religaNoToque() {
+    if (!emLuta() || !semSom()) return;
+    await ligaSom();
+    agenda();
+    avisoSom();
+  }
+  document.addEventListener('touchend', religaNoToque, true);
+  document.addEventListener('click', religaNoToque, true);
 
   /* ---------- fases ---------- */
 
@@ -237,14 +273,13 @@
     }
   });
 
-  document.addEventListener('visibilitychange', async () => {
-    if (document.hidden) return;
-    if (['prepara', 'round', 'descanso'].includes(fase)) {
-      seguraTela();
-      if (ctx && ctx.state !== 'running') { try { await ctx.resume(); } catch (e) {} }
-    }
+  document.addEventListener('visibilitychange', () => {
+    // foi pro fundo: o iPhone mata o som da pagina; na volta, a faixa vermelha pede um toque
+    if (document.hidden) { if (ctx) somVencido = true; return; }
+    if (emLuta()) seguraTela();
     passo();
   });
+  window.addEventListener('pagehide', () => { if (ctx) somVencido = true; });
 
   /* ---------- lembrar o ultimo ajuste ---------- */
 
