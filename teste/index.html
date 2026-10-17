@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b0b0c">
+<title>Teste de Som</title>
+<style>
+  :root {
+    --fundo: #0b0b0c; --cartao: #17171a; --linha: #2a2a2f; --texto: #f2f2f2; --apagado: #9a9aa3;
+    --vermelho: #e3262e; --verde: #2fbf5b; --amarelo: #f2c230;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; background: var(--fundo); color: var(--texto);
+    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    padding: calc(16px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom));
+  }
+  h1 { font-size: 34px; line-height: 1; margin: 8px 0 4px; letter-spacing: -0.5px; text-transform: uppercase; font-weight: 900; }
+  h1 span { color: var(--vermelho); }
+  .sub { color: var(--apagado); margin: 0 0 18px; }
+  .antes { background: var(--cartao); border-left: 4px solid var(--vermelho); border-radius: 10px; padding: 12px 14px; margin-bottom: 18px; }
+  .antes ol { margin: 6px 0 0; padding-left: 20px; }
+  .teste { background: var(--cartao); border: 1px solid var(--linha); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  .teste h2 { margin: 0 0 4px; font-size: 20px; font-weight: 900; text-transform: uppercase; }
+  .teste h2 b { color: var(--vermelho); }
+  .teste p { margin: 4px 0 12px; color: #cfcfd6; }
+  button { font: inherit; border: 0; cursor: pointer; }
+  .tocar {
+    width: 100%; padding: 16px; border-radius: 12px; background: var(--vermelho); color: #fff;
+    font-weight: 900; font-size: 18px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .tocar:active { transform: scale(0.98); }
+  .tocar.tocando { background: #555; }
+  .dois { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .resp { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .resp button {
+    padding: 9px 11px; border-radius: 999px; background: #232328; color: #ddd; font-size: 14px;
+    border: 1px solid var(--linha);
+  }
+  .resp button.sel { background: var(--verde); color: #04130a; border-color: var(--verde); font-weight: 700; }
+  .rotulo { font-size: 13px; color: var(--apagado); margin: 12px 0 0; }
+  .status { font-size: 14px; color: var(--amarelo); min-height: 1.2em; margin-top: 8px; }
+  #info { font-size: 13px; color: var(--apagado); background: #111114; border-radius: 10px; padding: 10px 12px; margin-bottom: 18px; word-break: break-word; }
+  #resumo { width: 100%; min-height: 160px; background: #111114; color: #ddd; border: 1px solid var(--linha); border-radius: 10px; padding: 10px; font: 13px/1.4 ui-monospace, Menlo, monospace; }
+  .copiar { margin-top: 10px; background: var(--verde); color: #04130a; }
+  .parar { width: 100%; padding: 12px; border-radius: 12px; background: #2a2a2f; color: #fff; font-weight: 700; margin-bottom: 18px; }
+</style>
+</head>
+<body>
+
+<h1>Teste de <span>Som</span></h1>
+<p class="sub">Timer de Jiu. Cada teste toca 5 beeps e o gongo.</p>
+
+<div class="antes">
+  <b>Antes de começar</b>
+  <ol>
+    <li>Conecte o iPhone na caixa Bluetooth.</li>
+    <li>Ponha uma música no Spotify, volte pra esta página e deixe tocando.</li>
+    <li>Modo silencioso <b>desligado</b> (só o teste 2 pede ligado).</li>
+    <li>Em cada teste, toque uma resposta. No fim, copie o resultado e me mande.</li>
+  </ol>
+</div>
+
+<div id="info">Carregando...</div>
+
+<button class="parar" id="pararTudo">Parar todos os sons</button>
+
+<div class="teste" id="t1">
+  <h2><b>1.</b> Por cima da música</h2>
+  <p>Com o Spotify tocando na caixa, no volume que o professor usa na aula.</p>
+  <button class="tocar" data-modo="ambient" data-rotulo="1">Tocar teste 1</button>
+  <div class="status"></div>
+  <div class="resp" data-teste="1">
+    <button>Gongo apareceu bem por cima</button>
+    <button>Ouvi, mas a música abafou</button>
+    <button>Música parou</button>
+    <button>Som saiu no celular, não na caixa</button>
+    <button>Não ouvi nada</button>
+  </div>
+</div>
+
+<div class="teste" id="t2">
+  <h2><b>2.</b> Com silencioso</h2>
+  <p><b>Ligue o modo silencioso</b> (chave ou botão lateral, ou pela Central de Controle), toque e depois desligue de novo.</p>
+  <button class="tocar" data-modo="ambient" data-rotulo="2">Tocar teste 2</button>
+  <div class="status"></div>
+  <div class="resp" data-teste="2">
+    <button>Tocou</button>
+    <button>Não tocou</button>
+  </div>
+</div>
+
+<div class="teste" id="t3">
+  <h2><b>3.</b> Tela bloqueada</h2>
+  <p>Toque o botão e <b>bloqueie a tela na hora</b> (botão lateral). Uns 10 segundos depois deveriam vir os 5 beeps e o gongo. A pesquisa diz que não vem; o teste confirma.</p>
+  <button class="tocar" data-fundo="ambient" data-rotulo="3">Tocar teste 3</button>
+  <div class="status"></div>
+  <div class="resp" data-teste="3">
+    <button>Tocou e a música continuou</button>
+    <button>Tocou, mas a música parou</button>
+    <button>Não tocou</button>
+  </div>
+</div>
+
+<div class="teste" id="t4">
+  <h2><b>4.</b> Tela acesa</h2>
+  <p>Toque o botão, solte o celular e espere passar o tempo do bloqueio automático (Ajustes, Tela e Brilho, Bloqueio Automático).</p>
+  <button class="tocar" id="acesa">Manter tela acesa</button>
+  <div class="status"></div>
+  <div class="resp" data-teste="4">
+    <button>Ficou acesa</button>
+    <button>Apagou</button>
+  </div>
+</div>
+
+<div class="teste">
+  <h2>Resultado</h2>
+  <p>Copie e me mande no chat.</p>
+  <textarea id="resumo" readonly></textarea>
+  <button class="tocar copiar" id="copiar">Copiar resultado</button>
+</div>
+
+<script>
+(() => {
+  const SONS = { beep: 'sons/beep.wav', gongo: 'sons/gongo.wav' };
+  const brutos = {};          // ArrayBuffer de cada som, baixado uma vez
+  const respostas = {};
+  const registro = [];        // o que a pagina observou sozinha
+  let ctx = null;             // AudioContext do teste atual
+  let audioFundo = null;      // <audio> do teste 5
+  let travaTela = null;
+  let pronto = null;          // promessa do download dos sons; tocar espera por ela
+
+  const temSessao = 'audioSession' in navigator;
+  const temTrava = 'wakeLock' in navigator;
+  const app = window.navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
+
+  function nota(txt) { registro.push(txt); atualiza(); }
+
+  function info() {
+    document.getElementById('info').textContent =
+      'Aparelho: ' + navigator.userAgent +
+      ' | audioSession: ' + (temSessao ? 'sim (' + navigator.audioSession.type + ')' : 'NÃO') +
+      ' | wakeLock: ' + (temTrava ? 'sim' : 'NÃO') +
+      ' | aberto como app: ' + (app ? 'sim' : 'não');
+  }
+
+  async function baixa() {
+    for (const [nome, url] of Object.entries(SONS)) {
+      const r = await fetch(url);
+      brutos[nome] = await r.arrayBuffer();
+    }
+  }
+
+  function defineSessao(tipo) {
+    if (!temSessao) return 'sem audioSession';
+    try { navigator.audioSession.type = tipo; } catch (e) { return 'erro: ' + e.message; }
+    return navigator.audioSession.type;
+  }
+
+  async function paraTudo() {
+    if (ctx) { try { await ctx.close(); } catch (e) {} ctx = null; }
+    if (audioFundo) { audioFundo.pause(); audioFundo.src = ''; audioFundo = null; }
+    if (temSessao) { try { navigator.audioSession.type = 'auto'; } catch (e) {} }
+    document.querySelectorAll('.tocar.tocando').forEach(b => b.classList.remove('tocando'));
+  }
+
+  // 5 beeps, um por segundo, e o gongo no sexto segundo
+  async function sequencia(botao, modo) {
+    await paraTudo();
+    const status = botao.closest('.teste').querySelector('.status');
+    const rotulo = botao.dataset.rotulo || botao.closest('.teste').id;
+    const tipo = defineSessao(modo);
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    await ctx.resume();
+    status.textContent = 'Carregando os sons...';
+    await pronto;
+    const beep = await ctx.decodeAudioData(brutos.beep.slice(0));
+    const gongo = await ctx.decodeAudioData(brutos.gongo.slice(0));
+    const t0 = ctx.currentTime + 0.3;
+    const toca = (buf, quando) => { const s = ctx.createBufferSource(); s.buffer = buf; s.connect(ctx.destination); s.start(quando); };
+    for (let i = 0; i < 5; i++) toca(beep, t0 + i);
+    toca(gongo, t0 + 5);
+    botao.classList.add('tocando');
+    status.textContent = 'Tocando... (sessão: ' + tipo + ')';
+    nota(rotulo + ': sessão pedida ' + modo + ', ficou ' + tipo + ', contexto ' + ctx.state);
+    const meu = ctx;
+    setTimeout(async () => {
+      if (ctx !== meu) return;
+      await paraTudo();
+      status.textContent = 'Terminou. O que você ouviu?';
+    }, 9500);
+  }
+
+  // teste 5: faixa unica num <audio>, que e o tipo de som que o iPhone deixa tocar bloqueado
+  async function fundo(botao, modo) {
+    await paraTudo();
+    const status = botao.closest('.teste').querySelector('.status');
+    const rotulo = botao.dataset.rotulo;
+    const tipo = defineSessao(modo);
+    audioFundo = new Audio('sons/fundo-teste.m4a');
+    audioFundo.preload = 'auto';
+    const a = audioFundo;
+    let pausouSozinho = false;
+    a.addEventListener('pause', () => { if (a === audioFundo && !a.ended) { pausouSozinho = true; nota(rotulo + ': o iPhone pausou o áudio em ' + a.currentTime.toFixed(1) + 's'); } });
+    a.addEventListener('ended', () => {
+      nota(rotulo + ': faixa chegou ao fim' + (pausouSozinho ? ' (depois de pausar)' : ''));
+      status.textContent = 'Terminou. O que você ouviu?';
+      botao.classList.remove('tocando');
+      if (temSessao) { try { navigator.audioSession.type = 'auto'; } catch (e) {} }
+    });
+    try {
+      await a.play();
+      botao.classList.add('tocando');
+      status.textContent = 'Bloqueie a tela agora. (sessão: ' + tipo + ')';
+      nota(rotulo + ': sessão pedida ' + modo + ', ficou ' + tipo + ', faixa começou');
+    } catch (e) {
+      status.textContent = 'Não tocou: ' + e.message;
+      nota(rotulo + ': play falhou, ' + e.message);
+    }
+  }
+
+  async function telaAcesa(botao) {
+    const status = botao.closest('.teste').querySelector('.status');
+    if (!temTrava) { status.textContent = 'Este iPhone não tem a função de manter a tela acesa.'; nota('4: wakeLock indisponível'); return; }
+    try {
+      travaTela = await navigator.wakeLock.request('screen');
+      status.textContent = 'Pedido aceito. Agora espere sem tocar na tela.';
+      nota('4: wakeLock aceito');
+      travaTela.addEventListener('release', () => nota('4: wakeLock solto pelo iPhone'));
+    } catch (e) {
+      status.textContent = 'Recusado: ' + e.message;
+      nota('4: wakeLock recusado, ' + e.message);
+    }
+  }
+
+  function atualiza() {
+    const linhas = ['TESTE DE SOM, TIMER JIU', new Date().toLocaleString('pt-BR'), navigator.userAgent,
+      'audioSession: ' + (temSessao ? 'sim' : 'não') + ' | wakeLock: ' + (temTrava ? 'sim' : 'não') + ' | como app: ' + (app ? 'sim' : 'não'), ''];
+    for (const k of ['1', '2', '3', '4']) linhas.push('Teste ' + k + ': ' + (respostas[k] || '(sem resposta)'));
+    linhas.push('', 'O que a página registrou:');
+    registro.forEach(r => linhas.push('- ' + r));
+    document.getElementById('resumo').value = linhas.join('\n');
+  }
+
+  document.querySelectorAll('.tocar[data-modo]').forEach(b => b.addEventListener('click', () => sequencia(b, b.dataset.modo).catch(e => nota('erro: ' + e.message))));
+  document.querySelectorAll('.tocar[data-fundo]').forEach(b => b.addEventListener('click', () => fundo(b, b.dataset.fundo)));
+  document.getElementById('acesa').addEventListener('click', e => telaAcesa(e.currentTarget));
+  document.getElementById('pararTudo').addEventListener('click', paraTudo);
+
+  document.querySelectorAll('.resp').forEach(grupo => {
+    grupo.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      grupo.querySelectorAll('button').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+      respostas[grupo.dataset.teste] = b.textContent;
+      atualiza();
+    }));
+  });
+
+  document.getElementById('copiar').addEventListener('click', async e => {
+    const caixa = document.getElementById('resumo');
+    try { await navigator.clipboard.writeText(caixa.value); e.currentTarget.textContent = 'Copiado!'; }
+    catch (err) { caixa.select(); document.execCommand('copy'); e.currentTarget.textContent = 'Copiado!'; }
+  });
+
+  document.addEventListener('visibilitychange', () => nota('página ' + (document.hidden ? 'foi pro fundo' : 'voltou') + ' às ' + new Date().toLocaleTimeString('pt-BR')));
+
+  info();
+  atualiza();
+  pronto = baixa();
+  pronto.catch(e => { document.getElementById('info').textContent += ' | ERRO ao baixar sons: ' + e.message; });
+})();
+</script>
+</body>
+</html>

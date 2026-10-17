@@ -1,0 +1,21 @@
+/* Ajustes do app em cima do visual Faixa Preta. Claude, 17/10/2026. */
+:root { --testbar-h: 0px; }
+html, body { overscroll-behavior: none; }
+body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+input { -webkit-user-select: text; user-select: text; }
+
+/* pausado no descanso ou no prepara: o numero fica lilas como no round (a regra da fase ganhava) */
+.app.is-paused .time { color: var(--pausado); }
+
+.setup-note b { color: #e6574b; font-weight: 700; }
+
+/* Aparece quando o iPhone pausa o som (ligacao, Siri, outro app tomou o audio). */
+.aviso-som {
+  position: absolute; z-index: 5; left: 50%; bottom: max(90px, calc(env(safe-area-inset-bottom) + 80px));
+  transform: translateX(-50%); width: min(92%, 420px);
+  display: flex; flex-direction: column; gap: 4px; align-items: center;
+  padding: 14px 18px; background: #c83e35; color: #fff; border: 0; border-radius: 4px;
+  box-shadow: 0 18px 50px #000c; letter-spacing: .06em;
+}
+.aviso-som b { font-size: 20px; font-weight: 800; }
+.aviso-som span { font-size: 14px; opacity: .9; }

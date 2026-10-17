@@ -1,0 +1,37 @@
+/* Faixa Preta. Codex, 2026-10-17. */
+:root { --bg: #111211; --surface: #20221f; --line: #42443c; --radius: 2px; --digit-font: 'Oswald', sans-serif; }
+.app { background: repeating-linear-gradient(38deg, #ffffff02 0 1px, transparent 1px 5px), repeating-linear-gradient(128deg, #ffffff02 0 1px, transparent 1px 5px), var(--bg); }
+.app::after { content: ''; position: absolute; z-index: -1; inset: 8px; border: 1px dashed #f3f1e825; pointer-events: none; }
+.brand-mark { background: #e8e4d7; clip-path: polygon(0 0, 38% 0, 100% 100%, 62% 100%, 0 0, 100% 0, 100% 38%, 0 100%, 0 62%, 100% 0); }
+.brand small { color: #e6574b; }
+.edition { border-left: 3px solid #c83e35; padding-left: 10px; }
+.setup-heading { margin: 10px 0 22px; padding: 20px 17px 17px; color: var(--bg); background: var(--ink); position: relative; }
+.setup-heading::after { content: ''; position: absolute; width: 46px; height: 14px; right: 17px; top: -5px; background: #c83e35; border-inline: 4px solid #111; transform: rotate(-5deg); }
+.setup-heading .eyebrow { color: #5c6256; }
+.setup-heading h1 { font-weight: 800; font-size: clamp(48px, 14vw, 76px); }
+.setup-heading .intro { color: #53584d; margin: 0; }
+legend::before { content: ''; width: 4px; height: 17px; background: #c83e35; margin: 3px 8px 0 0; }
+.primary { background: var(--ink); border-bottom: 5px solid #c83e35; }
+.phase-header { margin-top: 16px; border-top: 1px solid #ffffff30; }
+.phase-name { color: var(--bg); background: var(--accent); padding: 8px 12px 10px; transform: skew(-5deg); }
+.round-meta { border-right: 5px solid #c83e35; padding-right: 10px; }
+.timer-box::before, .timer-box::after { content: ''; width: 16px; height: 32px; border: 2px solid var(--accent); position: absolute; opacity: .75; }
+.timer-box::before { left: 0; top: 26%; border-right: 0; border-bottom: 0; }
+.timer-box::after { right: 0; bottom: 26%; border-left: 0; border-top: 0; }
+.time { letter-spacing: -.025em; }
+.separator { font-size: .74em; width: .29em; flex-basis: .29em; }
+.phase-track { height: 23px; background: #080908; padding: 5px; border-block: 1px dashed #ffffff3a; gap: 4px; }
+.phase-track::before { content: ''; width: 24%; background: #bd342b; margin-right: auto; }
+.phase-track i { max-width: 13px; background: var(--accent); }
+.urgent .time { color: var(--urgente); }
+.urgent .phase-header { border-top-color: var(--urgente); }
+.is-paused .time { color: var(--pausado); }
+.app[data-fase="descanso"] .time { color: var(--descanso); }
+.app[data-fase="prepara"] .time { color: var(--prepara); }
+.app[data-fase="fim"] .timer-box::before, .app[data-fase="fim"] .timer-box::after { display: none; }
+@media (orientation: landscape) and (max-height: 600px) {
+  .phase-header { margin-top: 0; padding-top: 4px; }
+  .phase-name { padding: 3px 12px 5px; }
+  .phase-track { height: 13px; padding: 2px; }
+  .timer-box::before, .timer-box::after { height: 20px; }
+}
