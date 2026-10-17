@@ -1,6 +1,6 @@
 /* Guarda o app no celular pra abrir sem internet (academia costuma ter sinal ruim).
    Ao publicar versao nova, trocar VERSAO: o iPhone baixa tudo de novo na abertura seguinte. */
-const VERSAO = 'faixa-preta-2026-10-17k';
+const VERSAO = 'faixa-preta-2026-10-17l';
 const ARQUIVOS = [
   './', 'index.html', 'base.css', 'faixa-preta.css', 'app.css', 'visual.js', 'motor.js',
   'manifest.webmanifest', 'icone-180.png', 'icone-192.png', 'icone-512.png',
@@ -8,7 +8,11 @@ const ARQUIVOS = [
 ];
 
 self.addEventListener('install', ev => {
-  ev.waitUntil(caches.open(VERSAO).then(c => c.addAll(ARQUIVOS)).then(() => self.skipWaiting()));
+  // cache: 'reload' busca direto do servidor: sem isso a versao nova podia guardar arquivo velho
+  // da cache de 10 min do GitHub Pages (foi o "fechei e abri e não mudou nada", 17/10/2026).
+  ev.waitUntil(caches.open(VERSAO)
+    .then(c => c.addAll(ARQUIVOS.map(u => new Request(u, { cache: 'reload' }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', ev => {
