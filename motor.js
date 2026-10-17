@@ -223,8 +223,8 @@
       if (pausadoRestante !== null) {
         fimDaFase = agora() + pausadoRestante;
         pausadoRestante = null;
+        seguraTela(); // antes de qualquer await: o iPhone so aceita dentro do toque
         await ligaSom();
-        seguraTela();
       }
       passo();
     } else if (acao === 'parar' || acao === 'novo-treino') {
